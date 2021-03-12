@@ -6,20 +6,43 @@ const jsonParser = express.json();
 
 moviesRouter
   .route("/")
-  .get((req, res, next) => {
-    MoviesService.getAllMovies(req.app.get("db"))
+  .get(requireAuth, (req, res, next) => {
+    MoviesService.getAllMoviesByUser(req.app.get("db"), req.user.id)
       .then((movies) => {
+        if (!movies) {
+          return res.status(404).json({
+            error: { message: `No movies` },
+          });
+        }
         res.json(movies);
       })
       .catch(next);
   })
-  .post(jsonParser, (req, res, next) => {
+
+  .delete(requireAuth, jsonParser, (req, res, next) => {
+    const { movie_id } = req.body;
+    MoviesService.deleteMovie(req.app.get("db"), movie_id)
+      .then(() => {
+        res.status(204).end();
+      })
+      .catch(next);
+  })
+  .post(requireAuth, jsonParser, (req, res, next) => {
     const { title, poster_path, vote_average } = req.body;
-    const newMovie = { title, poster_path, vote_average };
+    const newMovie = {
+      title,
+      poster_path,
+      user_id: req.user.id,
+      vote_average,
+    };
+
+    if (req.body.id) {
+      newMovie.id = req.body.id;
+    }
 
     MoviesService.insertMovie(req.app.get("db"), newMovie)
       .then((movie) => {
-        res.status(201).location(req.originalUrl).json(movie);
+        res.status(201).location(path.posix.join(`/movies`)).json(movie);
       })
       .catch(next);
   });
