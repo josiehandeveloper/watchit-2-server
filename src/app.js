@@ -20,6 +20,18 @@ app.use("/api/movies", moviesRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
 
+app.use((req, res, next) => {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "https://watchit-app-seven.vercel.app"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
+
 app.get("/", (req, res) => {
   res.send("Hello, world!");
 });
