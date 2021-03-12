@@ -1,10 +1,11 @@
+const knex = require("knex");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
 
 const AuthService = {
-  getUserWithEmail(db, email) {
-    return db("users").where({ email }).first();
+  getUserWithEmail(knex, email) {
+    return knex("users").where({ email }).first();
   },
   comparePasswords(password, hash) {
     return bcrypt.compare(password, hash);
@@ -19,9 +20,6 @@ const AuthService = {
     return jwt.verify(token, config.JWT_SECRET, {
       algorithms: ["HS256"],
     });
-  },
-  parseBasicToken(token) {
-    return Buffer.from(token, "base64").toString().split(":");
   },
 };
 
