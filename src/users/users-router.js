@@ -1,47 +1,68 @@
-const path = require("path");
 const express = require("express");
+const usersRouter = express.Router();
 const xss = require("xss");
 const UsersService = require("./users-service");
+const { requireAuth } = require("../middleware/jwt-auth");
 
-const usersRouter = express.Router();
-const jsonParser = express.json();
+const serializeUser = (user) => {
+  return {
+    id: user.id,
+    email: xss(user.email),
+    datecreated: user.datecreated,
+  };
+};
 
-const serializeUser = (user) => ({
-  id: user.id,
-  email: xss(user.fullname),
-  datecreated: user.date_created,
-});
+let knexInstance;
 
 usersRouter
   .route("/")
-  .get((req, res, next) => {
-    const knexInstance = req.app.get("db");
-    UsersService.getAllUsers(knexInstance)
-      .then((users) => {
-        res.json(users.map(serializeUser));
-      })
-      .catch(next);
+  .all((req, res, next) => {
+    knexInstance = req.app.get("db");
+    next();
   })
-  .post(jsonParser, (req, res, next) => {
+  .get(requireAuth, (req, res) => {
+    res.json(serializeUser(req.user));
+  })
+  .post((req, res) => {
     const { email, password } = req.body;
-    const newUser = { email };
+    const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
 
-    for (const [key, value] of Object.entries(newUser)) {
-      if (value == null) {
+    for (const field of ["email", "password"]) {
+      if (!req.body[field]) {
         return res.status(400).json({
-          error: { message: `Missing '${key}' in request body` },
+          error: `Missing ${field}`,
         });
       }
     }
+    if (password.length < 8) {
+      return res.status(400).json({
+        error: `Password must be 8 or more characters`,
+      });
+    }
 
-    newUser.email = email;
+    if (!REGEX_UPPER_LOWER_NUMBER_SPECIAL.test(password)) {
+      return res.status(400).json({
+        error: `Password must contain one uppercase character, one lowercase character, one special character and one number`,
+      });
+    }
 
-    UsersService.insertUser(req.app.get("db"), newUser)
-      .then((user) => {
-        res
-          .status(201)
-          .location(path.posix.join(req.originalUrl, `/${user.id}`))
-          .json(serializeUser(user));
-      })
-      .catch(next);
+    UsersService.hasUserWithEmail(knexInstance, email).then((hasUser) => {
+      if (hasUser) {
+        return res.status(400).json({
+          error: `Email already used`,
+        });
+      }
+
+      return UsersService.hashPassword(password).then((hashedPassword) => {
+        const newUser = {
+          email,
+          password: hashedPassword,
+        };
+
+        return UsersService.insertUser(knexInstance, newUser).then((user) => {
+          res.status(201).json(serializeUser(user));
+        });
+      });
+    });
   });
+module.exports = usersRouter;
