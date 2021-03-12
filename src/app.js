@@ -7,28 +7,23 @@ const { NODE_ENV } = require("./config");
 const moviesRouter = require("./movies/movies-router");
 const usersRouter = require("./users/users-router");
 const authRouter = require("./auth/auth-router");
-
 const app = express();
-
 const morganOption = NODE_ENV === "production" ? "tiny" : "common";
-
 app.use(morgan(morganOption));
-app.use(cors());
 app.use(helmet());
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT ,DELETE");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With, Content-Type, Authorization"
-  );
-  next();
-});
+app.use(express.json());
+app.use(morgan(morganOption));
+app.use(helmet());
+app.use(
+  cors({
+    origin: CLIENT_ORIGIN,
+  })
+);
 
-app.use("/api/movies", moviesRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/movies", moviesRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, world!");
