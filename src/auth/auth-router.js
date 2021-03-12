@@ -1,9 +1,11 @@
 const express = require("express");
 const AuthService = require("./auth-service");
-const { requireAuth } = require("../middleware/jwt-auth");
+// const { requireAuth } = require("../middleware/jwt-auth");
 
 const authRouter = express.Router();
 // const jsonBodyParser = express.json();
+
+let knexInstance;
 
 authRouter
   .route("/login")
@@ -13,8 +15,9 @@ authRouter
   })
   .post((req, res, next) => {
     const { email, password } = req.body;
+    const user = { password, email };
 
-    for (const [key, value] of Object.entries(loginUser))
+    for (const [key, value] of Object.entries(user))
       if (value == null)
         return res.status(400).json({
           error: `Missing '${key}' in request body`,
