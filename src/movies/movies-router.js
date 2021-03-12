@@ -1,5 +1,6 @@
 const express = require("express");
 const MoviesService = require("./movies-service");
+const { requireAuth } = require("../middleware/jwt-auth");
 
 const moviesRouter = express.Router();
 const jsonParser = express.json();
