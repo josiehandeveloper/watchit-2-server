@@ -1,9 +1,7 @@
 const express = require("express");
 const AuthService = require("./auth-service");
-// const { requireAuth } = require("../middleware/jwt-auth");
-
 const authRouter = express.Router();
-// const jsonBodyParser = express.json();
+const jsonParser = express.json();
 
 let knexInstance;
 
@@ -13,16 +11,17 @@ authRouter
     knexInstance = req.app.get("db");
     next();
   })
-  .post((req, res, next) => {
+  .post(jsonParser, (req, res, next) => {
     const { email, password } = req.body;
     const user = { password, email };
 
-    for (const [key, value] of Object.entries(user))
-      if (value == null)
+    for (const field of ["email", "password"]) {
+      if (!req.body[field]) {
         return res.status(400).json({
-          error: `Missing '${key}' in request body`,
+          error: `Missing ${field}`,
         });
-
+      }
+    }
     AuthService.getUserWithEmail(knexInstance, email)
       .then((dbUser) => {
         if (!dbUser)
@@ -31,8 +30,8 @@ authRouter
           });
 
         return AuthService.comparePasswords(password, dbUser.password).then(
-          (compareMatch) => {
-            if (!compareMatch)
+          (isMatch) => {
+            if (!isMatch)
               return res.status(400).json({
                 error: "Incorrect email  or password",
               });

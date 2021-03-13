@@ -8,4 +8,5 @@ module.exports = {
   TEST_DATABASE_URL:
     process.env.TEST_DATABASE_URL ||
     "postgresql://josephinehan@localhost/watchit2-test",
+  JWT_SECRET: process.env.JWT_SECRET || "garden-tracker-jwt",
 };

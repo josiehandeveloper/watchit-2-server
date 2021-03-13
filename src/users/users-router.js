@@ -2,6 +2,7 @@ const express = require("express");
 const usersRouter = express.Router();
 const xss = require("xss");
 const UsersService = require("./users-service");
+const jsonParser = express.json();
 
 const serializeUser = (user) => {
   return {
@@ -19,7 +20,7 @@ usersRouter
     knexInstance = req.app.get("db");
     next();
   })
-  .post((req, res) => {
+  .post(jsonParser, (req, res) => {
     const { email, password } = req.body;
     const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
 
@@ -56,7 +57,7 @@ usersRouter
         };
 
         return UsersService.insertUser(knexInstance, newUser).then((user) => {
-          res.status(201).json(user);
+          res.status(201).json(serializeUser(user));
         });
       });
     });
