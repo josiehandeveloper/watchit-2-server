@@ -56,7 +56,7 @@ usersRouter
         };
 
         return UsersService.insertUser(knexInstance, newUser).then((user) => {
-          res.status(201).json(serializeUser(user));
+          res.status(201).json(user);
         });
       });
     });
