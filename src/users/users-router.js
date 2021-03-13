@@ -2,7 +2,6 @@ const express = require("express");
 const usersRouter = express.Router();
 const xss = require("xss");
 const UsersService = require("./users-service");
-const { requireAuth } = require("../middleware/jwt-auth");
 
 const serializeUser = (user) => {
   return {
@@ -19,9 +18,6 @@ usersRouter
   .all((req, res, next) => {
     knexInstance = req.app.get("db");
     next();
-  })
-  .get(requireAuth, (req, res) => {
-    res.json(serializeUser(req.user));
   })
   .post((req, res) => {
     const { email, password } = req.body;
