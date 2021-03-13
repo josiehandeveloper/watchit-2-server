@@ -1,7 +1,7 @@
 const knex = require("knex");
 const bcrypt = require("bcryptjs");
 
-const UserService = {
+const UsersService = {
   hasUserWithEmail(knex, email) {
     return knex("users")
       .where({ email })
@@ -20,4 +20,4 @@ const UserService = {
   },
 };
 
-module.exports = UserService;
+module.exports = UsersService;
