@@ -29,7 +29,7 @@ moviesRouter
       })
       .catch(next);
   })
-  .post(requireAuth, jsonParser, (req, res, next) => {
+  .post(requireAuth, (req, res, next) => {
     const { title, poster_path, vote_average } = req.body;
     const newMovie = {
       title,
