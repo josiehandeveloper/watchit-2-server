@@ -4,13 +4,11 @@ const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 const { NODE_ENV, CLIENT_ORIGIN } = require("./config");
-const moviesRouter = require("./movies/movies-router");
-const usersRouter = require("./users/users-router");
-const authRouter = require("./auth/auth-router");
 const app = express();
 const morganOption = NODE_ENV === "production" ? "tiny" : "common";
-app.use(morgan(morganOption));
-app.use(helmet());
+const usersRouter = require("./users/users-router");
+const authRouter = require("./auth/auth-router");
+const moviesRouter = require("./movies/movies-router");
 
 app.use(express.json());
 app.use(morgan(morganOption));

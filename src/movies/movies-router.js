@@ -46,7 +46,7 @@ moviesRouter
 
     MoviesService.insertMovie(req.app.get("db"), newMovie)
       .then((movie) => {
-        res.status(201).location(path.posix.join(`/movies`)).json(movie);
+        res.status(201).location(`/movies`).json(movie);
       })
       .catch(next);
   });
