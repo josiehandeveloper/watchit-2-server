@@ -1,3 +1,5 @@
+const knex = require("knex");
+
 const MoviesService = {
   getAllMovies(knex) {
     return knex.select("*").from("movies");

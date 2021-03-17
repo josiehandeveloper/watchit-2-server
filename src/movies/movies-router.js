@@ -1,4 +1,6 @@
 const express = require("express");
+const knex = require("knex");
+const xss = require("xss");
 const MoviesService = require("./movies-service");
 const { requireAuth } = require("../middleware/jwt-auth");
 const path = require("path");

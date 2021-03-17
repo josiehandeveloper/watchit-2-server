@@ -5,3 +5,4 @@ CREATE TABLE movies (
     vote_average NUMERIC, 
     datecreated TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
