@@ -3,6 +3,7 @@ const knex = require("knex");
 const xss = require("xss");
 const MoviesService = require("./movies-service");
 const { requireAuth } = require("../middleware/jwt-auth");
+const jsonParser = express.json();
 const path = require("path");
 
 const moviesRouter = express.Router();
@@ -31,7 +32,7 @@ moviesRouter
       })
       .catch(next);
   })
-  .post(requireAuth, (req, res, next) => {
+  .post(jsonParser, (req, res, next) => {
     const { title, poster_path, vote_average } = req.body;
     const newMovie = {
       title,
