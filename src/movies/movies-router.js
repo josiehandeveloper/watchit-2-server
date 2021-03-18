@@ -13,11 +13,11 @@ moviesRouter
   .get(requireAuth, (req, res, next) => {
     MoviesService.getAllMoviesByUser(req.app.get("db"), req.user.id)
       .then((movies) => {
-        if (!movies) {
-          return res.status(404).json({
-            error: { message: `No movies` },
-          });
-        }
+        // if (!movies) {
+        //   return res.status(404).json({
+        //     error: { message: `No movies` },
+        //   });
+        // }
         res.json(movies);
       })
       .catch(next);
