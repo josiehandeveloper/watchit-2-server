@@ -8,7 +8,7 @@ const app = express();
 const morganOption = NODE_ENV === "production" ? "tiny" : "common";
 const usersRouter = require("./users/users-router");
 const authRouter = require("./auth/auth-router");
-const moviesRouter = require("./movies/movies-router");
+const MoviesRouter = require("./movies/movies-router");
 
 app.use(express.json());
 app.use(morgan(morganOption));
@@ -21,7 +21,7 @@ app.use(
 
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
-app.use("/api/movies", moviesRouter);
+app.use("/api/movies", MoviesRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, world!");

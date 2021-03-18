@@ -5,11 +5,10 @@ const MoviesService = require("./movies-service");
 const { requireAuth } = require("../middleware/jwt-auth");
 const path = require("path");
 
-const moviesRouter = express.Router();
+const MoviesRouter = express.Router();
 const jsonParser = express.json();
 
-moviesRouter
-  .route("/")
+MoviesRouter.route("/")
   .get(requireAuth, (req, res, next) => {
     MoviesService.getAllMoviesByUser(req.app.get("db"), req.user.id)
       .then((movies) => {
@@ -46,9 +45,9 @@ moviesRouter
 
     MoviesService.insertMovie(req.app.get("db"), newMovie)
       .then((movie) => {
-        res.status(201).location(`/movies`).json(movie);
+        res.status(201).location(`/api/movies`).json(movie);
       })
       .catch(next);
   });
 
-module.exports = moviesRouter;
+module.exports = MoviesRouter;
